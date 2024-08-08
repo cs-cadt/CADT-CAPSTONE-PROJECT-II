@@ -1,0 +1,511 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+
+{% block title %} Admin | Dashboard {% endblock title %}
+
+{% block extrastyle %}
+
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  <!-- Tempusdominus Bootstrap 4 -->
+  <link rel="stylesheet" href="{% static 'plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
+  <!-- iCheck -->
+  <link rel="stylesheet" href="{% static 'plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+  <!-- JQVMap -->
+  <link rel="stylesheet" href="{% static 'plugins/jqvmap/jqvmap.min.css' %}">
+  <!-- Daterange picker -->
+  <link rel="stylesheet" href="{% static 'plugins/daterangepicker/daterangepicker.css' %}">
+  <!-- summernote -->
+  <link rel="stylesheet" href="{% static 'plugins/summernote/summernote-bs4.min.css' %}">
+
+  <!-- Custom Styles -->
+  <style>
+    .content-wrapper {
+      background-color: #E8F0FA;
+      
+    }
+    .small-box {
+      background-color: white;
+      color: black;
+      text-align: center;
+      border-radius: 10px;
+      border-image: linear-gradient(to bottom right, rgba(0,0,0,0.25), rgba(255,0,0,0.25));
+      border-image-slice: 1;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Drop shadow */
+    }
+    .small-box .inner {
+      font-size: 20px; 
+      font-weight: normal; 
+    }
+    .small-box .inner h3 {
+      color: #F58C29;
+      font-size: 20px; /* Size for the text "Total Request" */
+      font-weight: bold; /* Normal weight for the text "Total Request" */
+    }
+    .small-box .inner .number {
+      font-size: 40px; 
+      font-weight: 500;
+      
+    }
+    .card-title {
+      font-weight: bold;
+      color: #15274b;
+      font-size: 20px;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-group{
+      margin-left: auto; /* Pushes the btn-group to the right */
+      
+
+    }
+    .card-title {
+      margin: 0; /* No extra margin around the title */
+    }
+  </style>
+
+{% endblock extrastyle %}
+
+{% block bodyclass %} hold-transition sidebar-mini layout-fixed {% endblock bodyclass %}
+
+{% block content %}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper"> 
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+              <h2 class="m-0" style="color: #434242; font-size: 18;">Dashboard</h2>
+            </div>
+          <!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <!-- Small boxes (Stat box) -->
+        <div class="row justify-content-center mt-3">
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box">
+              <div class="inner">
+                <h3>Total Request</h3>
+                <p class="number" id="total_question">?</p>
+              </div>
+            </div>
+          </div>
+          <!-- ./col -->
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box">
+              <div class="inner">
+                <h3>Total Answered</h3>
+                <p class="number" id="total_answered">?</p>
+              </div>
+            </div>
+          </div>
+          <!-- ./col -->
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box">
+              <div class="inner">
+                <h3>Total Unanswered</h3>
+                <p class="number" id="total_unanswered">?</p>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+        <!-- /.row -->
+        <!-- Main row -->
+        <div class="row mt-3">
+          <!-- Left col -->
+          <section class="col-lg-12 connectedSortable">
+            <div class="row">
+              <!-- Custom tabs (Charts with tabs)-->
+              <!-- Stacked Bar Chart for Overview -->
+              <div class="col-lg-7 col-md-12">
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">Overview</h3>
+                    <!-- Toggle Buttons -->
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-secondary" id="btn-week" onclick="updateOverviewChart('week')">Week</button>
+                      <button type="button" class="btn btn-secondary" id="btn-month" onclick="updateOverviewChart('month')">Month</button>
+                    </div>
+                  </div>
+                  <!-- /.card-header -->
+                  <div class="card-body">
+                    <div class="chart tab-pane active" id="overview-chart" style="position: relative; height: 300px;">
+                      <canvas id="overview-chart-canvas" height="300" style="height: 300px;"></canvas>
+                    </div>
+                  </div>
+                  <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+              </div>
+             <!-- Line Chart for Analysis -->
+             <div class="col-lg-5 col-md-12">
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">Analysis</h3>
+                  <!-- Toggle Buttons -->
+                  <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" id="btn-week-analysis" onclick="updateAnalysisChart('week')">Week</button>
+                    <button type="button" class="btn btn-secondary" id="btn-month-analysis" onclick="updateAnalysisChart('month')">Month</button>
+                  </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                  <div class="tab-content p-0">
+                    <!-- Line chart -->
+                    <div class="chart tab-pane active" id="analysis-chart" style="position: relative; height: 300px;">
+                      <canvas id="analysis-chart-canvas" height="300" style="height: 300px;"></canvas>
+                    </div>
+                  </div>
+                </div>
+                <!-- /.card-body -->
+              </div>
+              <!-- /.card -->
+            </div>
+          </div>
+          <!-- table of unanswered questtions start here -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title pt-3">List of Unanswered Question</h3>
+            </div>
+            <div class="card-body">
+              <form method="POST" action="#">
+                {% csrf_token %}
+              <table id="example1" class="table table-bordered table-striped">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Questions</th>
+                    <th>Created At</th>
+                    <!-- <th>Actions</th> -->
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for question in questions %}
+                    <tr>
+                      <td>{{ forloop.counter }}</td> <!-- Display row number -->
+                      <td>{{ question.question }}</td>
+                      <td>{{ question.created_at }}</td>
+                      <!-- <td class="table-actions">
+                        <a href="#" class="delete pl-2" title="Delete" data-id="{{ question.id }}" data-toggle="tooltip">
+                          <i class="fas fa-trash-alt" id="delete" style="color: red"></i>
+                        </a>
+                      </td> -->
+                    </tr>
+                    {% empty %}
+                    <tr>
+                      <td colspan="4">No unanswered questions found.</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- table section end here -->
+
+        </section>
+      </div>        
+      <!-- /.row (main row) -->
+    </div><!-- /.container-fluid -->
+  </section>
+  <!-- /.content -->
+</div>
+  {% endblock content %}
+
+  {% block extra_scripts %}
+  
+    <!-- jQuery UI 1.11.4 -->
+    <script src="{% static 'plugins/jquery-ui/jquery-ui.min.js' %}"></script>
+    <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+    <script>
+      $.widget.bridge('uibutton', $.ui.button)
+    </script>
+
+    <!-- ChartJS -->
+    <script src="{% static 'plugins/chart.js/Chart.min.js' %}"></script>
+    <!-- Sparkline -->
+    <script src="{% static 'plugins/sparklines/sparkline.js' %}"></script>
+    <!-- JQVMap -->
+    <script src="{% static 'plugins/jqvmap/jquery.vmap.min.js' %}"></script>
+    <script src="{% static 'plugins/jqvmap/maps/jquery.vmap.usa.js' %}"></script>
+    <!-- jQuery Knob Chart -->
+    <script src="{% static 'plugins/jquery-knob/jquery.knob.min.js' %}"></script>
+    <!-- daterangepicker -->
+    <script src="{% static 'plugins/moment/moment.min.js' %}"></script>
+    <script src="{% static 'plugins/daterangepicker/daterangepicker.js' %}"></script>
+    <!-- Tempusdominus Bootstrap 4 -->
+    <script src="{% static 'plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
+    <!-- Summernote -->
+    <script src="{% static 'plugins/summernote/summernote-bs4.min.js' %}"></script>
+    <!-- overlayScrollbars -->
+    <script src="{% static 'plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js' %}"></script>
+    <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+    <!-- <script src="{% static 'dist/js/pages/dashboard.js' %}"></script> -->
+  
+    <!-- JavaScript for rendering the charts -->
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chart Display</title>
+  <style>
+    .chart-container {
+      width: 50%; /* Default width for the chart */
+      height: 300px; /* Default height for the chart */
+      position: relative;
+      margin-bottom: 20px; /* Space between charts */
+      margin: auto; /* Center the chart container */
+    }
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="chart-container" id="overview-chart-container">
+    <canvas id="overview-chart-canvas"></canvas>
+  </div>
+  <div class="chart-container" id="analysis-chart-container">
+    <canvas id="analysis-chart-canvas"></canvas>
+  </div>
+
+  <!-- JavaScript for rendering the charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    var overviewChart, analysisChart;
+
+    function updateChartDimensions(period) {
+      var overviewContainer = document.getElementById('overview-chart-container');
+      var analysisContainer = document.getElementById('analysis-chart-container');
+
+      if (period === 'week') {
+        overviewContainer.style.width = '70%'; // Adjust width for weekly view
+        overviewContainer.style.height = '300px'; // Adjust height for weekly view
+
+        analysisContainer.style.width = '70%'; // Adjust width for weekly view
+        analysisContainer.style.height = '300px'; // Adjust height for weekly view
+      } else {
+        overviewContainer.style.width = '50%'; // Adjust width for monthly view
+        overviewContainer.style.height = '400px'; // Adjust height for monthly view
+
+        analysisContainer.style.width = '50%'; // Adjust width for monthly view
+        analysisContainer.style.height = '400px'; // Adjust height for monthly view
+      }
+    }
+
+    async function updateOverviewChart(period) {
+      let response = await fetch("/api/monitoring/numbers/",{
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                });
+      data = await response.json()
+      data_month = data.month
+      data_week = data.week
+      var data = period === 'week' ? data_week : data_month;
+      if (overviewChart) {
+        overviewChart.destroy();
+      }
+  
+      var ctx = document.getElementById('overview-chart-canvas').getContext('2d');
+      overviewChart = new Chart(ctx, {
+        type: 'bar',
+        data: data,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              stacked: true
+            },
+            y: {
+              stacked: true
+            }
+          }
+        }
+      });
+    }
+  
+
+    async function updateAnalysisChart(period) {
+      let response = await fetch("/api/monitoring/numbers/",{
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        });
+      data = await response.json()
+      data_month = data.month
+      data_week = data.week
+      var data = period === 'week' ? 
+      {
+        labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        datasets: [
+          {
+            label: 'Total Request',
+            data: data_week.datasets[0].data,
+            borderColor: '#2C50C5',
+            backgroundColor: 'rgba(44, 80, 197, 0.2)',
+            fill: true
+          },
+          {
+            label: 'Total Answered',
+            data: data_week.datasets[1].data,
+            borderColor: '#5577E3',
+            backgroundColor: 'rgba(85, 119, 227, 0.2)',
+            fill: true
+          },
+          {
+            label: 'Total Unanswered',
+            data: data_week.datasets[2].data,
+            borderColor: '#9CC8FF',
+            backgroundColor: 'rgba(156, 200, 255, 0.2)',
+            fill: true
+          }
+        ]
+      } : 
+      {
+        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+        datasets: [
+          {
+            label: 'Total Request',
+            data: data_month.datasets[0].data,
+            borderColor: '#2C50C5',
+            backgroundColor: 'rgba(44, 80, 197, 0.2)',
+            fill: true
+          },
+          {
+            label: 'Total Answered',
+            data: data_month.datasets[1].data,
+            borderColor: '#5577E3',
+            backgroundColor: 'rgba(85, 119, 227, 0.2)',
+            fill: true
+          },
+          {
+            label: 'Total Unanswered',
+            data: data_month.datasets[2].data,
+            borderColor: '#9CC8FF',
+            backgroundColor: 'rgba(156, 200, 255, 0.2)',
+            fill: true
+          }
+        ]
+      };
+
+      if (analysisChart) {
+        analysisChart.destroy();
+      }
+
+      var ctx = document.getElementById('analysis-chart-canvas').getContext('2d');
+      analysisChart = new Chart(ctx, {
+        type: 'line',
+        data: data,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(tooltipItem) {
+                  return tooltipItem.dataset.label + ': ' + tooltipItem.raw;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    async function updateChartNumbers(){
+            let response = await fetch("/api/monitoring/numbers/",{
+              method: "GET",
+              headers: {
+                  "Content-Type": "application/json",
+                  'X-CSRFToken': '{{ csrf_token }}'
+              }
+          });
+        data = await response.json()
+        data_month = data.month
+        total = data_month.datasets[0].data.reduce((a, b) => a + b, 0)
+        total_answered = data_month.datasets[1].data.reduce((a, b) => a + b, 0)
+        total_unanswered = data_month.datasets[2].data.reduce((a, b) => a + b, 0)
+        document.getElementById('total_answered').innerText = total_answered
+        document.getElementById('total_question').innerText = total
+        document.getElementById('total_unanswered').innerText = total_unanswered
+    }
+
+    // Initialize charts with default data
+    document.addEventListener('DOMContentLoaded', function() {
+      updateChartNumbers();
+      var period = 'week'; // or 'month' based on user selection
+      updateChartDimensions(period);
+      updateOverviewChart(period);
+      updateAnalysisChart(period);
+    });
+
+    // Example of changing the period
+    document.getElementById('change-period-button').addEventListener('click', function() {
+      var newPeriod = 'month'; // or 'week' based on your logic
+      updateChartDimensions(newPeriod);
+      updateOverviewChart(newPeriod);
+      updateAnalysisChart(newPeriod);
+    });
+    
+    $(document).ready(function() {
+      $('.delete').on('click', function(e) {
+        e.preventDefault();
+        var questionId = $(this).data('id');
+        
+        if(confirm('Are you sure you want to delete this question?')) {
+          $.ajax({
+            url: '{% url "unanswered" %}', // URL of the UnAnsweredAPI view
+            type: 'DELETE',
+            data: {
+              'id': questionId,
+              'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+              alert(response.message);
+              location.reload(); // Reload the page to see the changes
+            },
+            error: function(response) {
+              alert(response.responseJSON.error);
+            }
+          });
+        }
+      });
+    });
+  
+  </script>
+</body>
+</html>
+
+    
+  {% endblock extra_scripts %}
+

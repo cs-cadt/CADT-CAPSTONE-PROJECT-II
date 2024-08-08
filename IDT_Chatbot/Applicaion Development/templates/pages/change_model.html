@@ -1,0 +1,134 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block title %} Admin | Change Model {% endblock title %}
+
+{% block extrastyle %}
+<!-- Add any additional CSS here -->
+{% endblock extrastyle %}
+
+{% block bodyclass %} hold-transition sidebar-mini {% endblock bodyclass %}
+
+{% block content %}
+<div class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Change Model</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'manage_models' %}">Model List</a></li>
+            <li class="breadcrumb-item active">Change Model</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title pt-3">Change Model</h3>
+            </div>
+            <div class="card-body">
+                <form id="change-model-form" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                      <label for="modelname">Select Model:</label>
+                      <select class="form-control" id="modelname" name="modelname">
+                        <!-- Options will be populated by JavaScript -->
+                      </select>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <a href="{% url 'manage_models' %}" class="btn btn-secondary">Back</a>
+                      </div>
+                      <div class="col-md-6 text-right">
+                        <button type="submit" class="btn btn-primary">Change Model</button>
+                      </div>
+                    </div>
+                </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock content %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+$(document).ready(function () {
+  // Fetch available models and populate the dropdown
+  fetch('/api/model/change')
+    .then(response => response.json())
+    .then(data => {
+      const modelSelect = document.getElementById('modelname');
+      data.models.forEach(model => {
+        const option = document.createElement('option');
+        option.value = model;
+        option.textContent = model;
+        modelSelect.appendChild(option);
+      });
+    });
+
+  // CSRF token setup for AJAX
+  $.ajaxSetup({
+    headers: {
+      'X-CSRFToken': $('meta[name="csrf-token"]').attr('content')
+    }
+  });
+
+  $('#change-model-form').on('submit', function (e) {
+    e.preventDefault();
+
+    const modelName = document.getElementById('modelname').value;
+
+    $.ajax({
+      url: '/api/model/change',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ modelname: modelName }),
+      success: function (response) {
+        // Check if the response contains a success message
+        if (response.message) {
+          Swal.fire(
+            'Success!',
+            response.message,
+            'success'
+          ).then(() => {
+            window.location.href = "{% url 'manage_models' %}";
+          });
+        } else if (response.error) {
+          Swal.fire(
+            'Error!',
+            response.error,
+            'error'
+          );
+        } else {
+          Swal.fire(
+            'Error!',
+            'Unexpected response format.',
+            'error'
+          );
+        }
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        Swal.fire(
+          'Error!',
+          'An error occurred while changing the model. Please try again.',
+          'error'
+        );
+      }
+    });
+  });
+});
+</script>
+{% endblock extra_scripts %}

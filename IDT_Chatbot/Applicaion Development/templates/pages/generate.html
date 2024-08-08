@@ -1,0 +1,112 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block title %} Admin | Generate Secret Key {% endblock title %}
+
+{% block extrastyle %}
+<!-- Add any additional CSS here -->
+{% endblock extrastyle %}
+
+{% block bodyclass %} hold-transition sidebar-mini {% endblock bodyclass %}
+
+{% block content %}
+<div class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Generate Secret Key</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'manage_secret_key' %}">Secret Key List</a></li>
+            <li class="breadcrumb-item active">Generate Secret Key</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title pt-3">Generate Secret Key</h3>
+            </div>
+            <div class="card-body">
+              <form id="generate-secret-key-form">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label for="name">Name:</label>
+                  <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <a href="{% url 'manage_secret_key' %}" class="btn btn-secondary">Back</a>
+                  </div>
+                  <div class="col-md-6 text-right">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock content %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+  document.getElementById('generate-secret-key-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    
+    const name = document.getElementById('name').value;
+    const token = localStorage.getItem('adminToken');
+    
+    fetch('{% url "secretkey" %}', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({ name: name })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.meta.status === 200) {
+        Swal.fire({
+          title: 'Success!',
+          text: data.meta.message,
+          icon: 'success',
+          confirmButtonText: 'OK'
+        }).then(() => {
+          window.location.href = "{% url 'manage_secret_key' %}";
+        });
+      } else {
+        Swal.fire({
+          title: 'Error!',
+          text: data.message,
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      Swal.fire({
+        title: 'Error!',
+        text: 'An unexpected error occurred.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+    });
+  });
+</script>
+{% endblock extra_scripts %}

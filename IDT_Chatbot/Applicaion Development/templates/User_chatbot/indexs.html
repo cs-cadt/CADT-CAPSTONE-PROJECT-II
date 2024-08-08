@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="style.css"> -->
+
+    <!-- Google Fonts Link For Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,1,0" />
+    <style>
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Inter;
+}
+
+body {
+    background: #FFF; /* White background */
+}
+
+.chatbot-speedbuble {
+    right: 40px;
+    bottom: 15px;
+    position: fixed;
+    width: 70px;
+    height: 70px;
+    cursor: pointer;
+    background: none; /* Remove background */
+    border: none; /* Remove border */
+    display: flex;
+    align-items: center; 
+    justify-content: center; 
+    z-index: 1000; /* Ensure the bubble is above other elements */
+}
+
+.chatbot-speedbuble .large-img {
+    width: 70px;
+    height: 70px;
+    cursor: pointer;
+    z-index: 1001; /* Ensure the image is above other elements in the bubble */
+} 
+
+.chatbot {
+    position: fixed;
+    right: 100px;
+    bottom: 100px;
+    top:20px;
+    width: 400px;
+    overflow: hidden;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 0 128px 0 rgba(0, 0, 0, 0.1),
+                0 32px 64px -48px rgba(0, 0, 0, 0.5);
+    z-index: 999; /* Ensure the chatbot is above most elements but below the bubble */
+    display: none; /* Initially hide the chatbot */
+}
+
+.chatbot.show {
+    display: block; /* Show the chatbot when the .show class is added */
+}
+
+.chatbot header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    height: 50px;
+    background: #15274B;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25) inset;
+    position: relative;
+}
+
+.chatbot header h2 {
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Tooltip Container */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+/* Tooltip Text */
+.tooltip-text {
+    visibility: hidden;
+    position: absolute;
+    bottom: -35px; /* Position the tooltip 35px below the header */
+    left: 50%; /* Center the tooltip horizontally */
+    transform: translateX(-50%); /* Center the tooltip horizontally */
+    background-color: #343232; /* Background color for the tooltip */
+    color: #fefefe; /* Text color */
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    white-space: nowrap; /* Prevent text from wrapping */
+    display: none; /* Initially hide the tooltip */
+    z-index: 1000; /* Ensure the tooltip appears above other elements */
+}
+
+/* Show the tooltip text when hovering over the tooltip container */
+.tooltip:hover .tooltip-text {
+    visibility: visible;
+}
+
+body.blur {
+    filter: blur(10px);
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.confirmation-box.show {
+    display: block;
+}
+
+.container-chatbot {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* or a fixed height value */
+    width: 100%; /* or a fixed width value */
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none; /* Hide container by default */
+    z-index: 9999; /* Ensure it is above other elements */
+    background: rgba(0, 0, 0, 0.5); /* Add a semi-transparent background */
+}
+
+.confirmation-box {
+    width: 270px;
+    height: 100px;
+    flex-shrink: 0;
+    border-radius: 16px;
+    border: 1px solid #000;
+    background: #1B2F6F;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    display: flex;
+    top:20px;
+    flex-direction: column;
+    justify-content: center; /* Center the content vertically */
+    align-items: center; /* Center the content horizontally */
+}
+
+.text {
+    flex-shrink: 0;
+    color: #FFF;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.Button-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 50%;
+}
+
+.Button {
+    width: 64px;
+    height: 24px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 15px; /* Add margin to create space between buttons */
+    cursor: pointer;
+}
+
+.cancel-Button {
+    background: #F58C29;
+    color: #FFF;
+}
+
+.yes-Button {
+    background: #F00;
+    color: #FFF;
+}
+
+.yes-Button:hover {
+    background-color: #E60000;
+}
+
+.cancel-Button:hover {
+    background-color: #DD7E25;
+}
+
+.medium-img {
+    width: 40px;
+    height: 40px;
+    position: relative;
+    margin-right: 340px;
+}
+
+.small-img {
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    right: 20px;
+    filter: invert(100%);
+    cursor: pointer;
+}
+.small-img:hover::after {
+    content: "Close";
+    display: inline-block;
+    width: auto;
+    position: absolute;
+    font-size: 12px;
+    left: -10px; /* Adjust position as needed */
+    bottom: -33px; /* Adjust position as needed */
+    background-color: #343232; /* Background color for the text */
+    color: #fefefe; /* Text color */
+    padding: 5px;
+    border-radius: 5px;
+    white-space: nowrap; /* Prevents text from wrapping */
+    text-align: center;
+}
+
+.small-img-top {
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    right: 50px;
+    cursor: pointer;
+    filter: invert(100%);
+    
+}
+
+.small-img-top:hover::after {
+    content: "Clear all meassages";
+    display: inline-block;
+    width: auto;
+    position: absolute;
+    font-size: 12px;
+    left: -60px; /* Adjust position as needed */
+    bottom: -30px; /* Adjust position as needed */
+    background-color: #7e7a7a; /* Background color for the text */
+    color: #fff; /* Text color */
+    padding: 5px;
+    border-radius: 5px;
+    white-space: nowrap; /* Prevents text from wrapping */
+    text-align: center;
+  
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+    margin-right: 10px;
+}
+
+.nested-img {
+    width: 36px;
+    height: 36px;
+    margin-left: 10px; /* Adjust margin to left to provide space between text and image */
+}
+
+.full-screen {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    right: 90px;
+    cursor: pointer;
+    filter: invert(100%); /* This will invert the colors, making black white */
+}
+
+.full-screen:hover::after {
+    content: " Full Screen";
+    display: inline-block;
+    position: absolute;
+    font-size: 12px;
+    left: -30px; /* Adjust position as needed */
+    bottom: -35px; /* Adjust position as needed */
+    background-color: #343232; /* Background color for the text */
+    color: #fefefe; /* Text color */
+    padding: 5px;
+    border-radius: 5px;
+    white-space: nowrap; /* Prevents text from wrapping */
+}
+
+.chatbot .chatbox {
+    height: calc(100% - 150px); /* Adjusted height to account for header and chat input */
+    overflow: auto;
+    padding: 30px 20px 100px;
+}
+
+.chatbot :where(.chatbox, textarea)::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chatbot :where(.chatbox, textarea)::-webkit-scrollbar-track {
+    background: #fff;
+    border-radius: 25px;
+}
+
+.chatbot :where(.chatbox, textarea)::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 25px;
+}
+
+.chatbox .chat {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.chatbox .chat p.error {
+    color: #721c24;
+    background: #f8d7da;
+}
+
+.chatbox .outgoing {
+    justify-content: flex-start;
+    flex-direction: row-reverse; /* Ensures image is to the right of the text */
+}
+
+.chatbox .chat p {
+    color: #FFF;
+    max-width: 75%;
+    word-wrap: break-word;
+    font-size: 0.95rem;
+    padding: 12px 16px;
+    border-radius: 10px 10px 0px 10px;
+    background: #1B2F6F;
+}
+
+.chatbox .incoming p {
+    color: #000;
+    background: #f2f2f2;
+    border-radius: 10px 10px 10px 0px;
+}
+
+/* Style for the scrolling content container */
+.chatbot-::content  {
+    width: 100%;
+    height: 48px;
+    overflow-x: auto;
+    white-space: nowrap;
+    position: absolute;
+    top: calc(100% - 40px); /* Adjusted position from bottom */
+    scrollbar-width: auto; /* For Firefox */
+    -ms-overflow-style: auto; /* For Internet Explorer and Edge */
+    z-index: -1000;
+}
+
+/* Style for the buttons container */
+.buttons {
+    width: 100%;
+    height: 44px;
+    display: flex;
+    white-space: nowrap;
+    align-items: center;
+    position: absolute;
+    top: calc(100% - 130px); /* Position above the chat input */
+    overflow-x: auto;
+    scrollbar-width: none; /* For Firefox */
+    -ms-overflow-style: none; /* For Internet Explorer and Edge */
+    scroll-snap-type: x mandatory; /* For scrolling both ways */
+    margin-left: 20px; /* Adjusted margin on the left side */
+    background: #fff; /* Optional: background color to ensure visibility */
+    height: 40px;
+    margin: 40 20px; /* Adjust margin as needed */
+    
+}
+
+.buttons::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+/* Style for individual buttons */
+.button {
+    width: 134px; /* Adjusted width to fit within .buttons container */
+    height: 40px; /* Adjusted height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0; /* Prevent shrinking */
+    margin: 0px 5px; /* Adjusted margin between buttons */
+    cursor: pointer;
+    
+}
+
+/* Style for the content inside each button */
+.button div {
+    width: 100%;
+    height: 100%;
+    background: rgb(255, 255, 255);
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
+    border-radius: 20px;
+    border: 2px solid #1B2F6F;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.button div:hover {
+    background: #1B2F6F;
+    color: #fff;
+    border-radius: 20px;
+    border: 2px solid #141212;
+}
+
+/* Setting scroll-snap points for each button */
+.button:nth-child(1) {
+    scroll-snap-align: start;
+}
+
+.button:nth-child(6) {
+    scroll-snap-align: end;
+}
+
+/* Style for the chat input container */
+.chatbot .chat-input {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    position: absolute;
+    width: 95%;
+    background: #fff;
+    padding: 3px 20px;
+    border-radius: 28px;
+    border: 2px #1B2F6F solid;
+    bottom: 20px;
+    margin-left: 10px;
+}
+
+/* Style for the textarea inside the chat input */
+.chat-input textarea {
+    width: calc(100% - 30px); /* Adjust width to accommodate send button */
+    height: 44px; /* Fixed height for textarea */
+    padding: 13px; /* Adjust padding to fit within the container */
+    border-radius: 10px;
+    border: none;
+    resize: none;
+    outline: none;
+    color: #3e3c3c;
+    font-size: 0.95rem;
+    font-weight: 400;
+    display: flex;
+    text-align: left; /* Ensure text is left-aligned */
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
+    background: transparent; /* Remove background to match the container */
+    margin-right: 10px; /* Add a small margin to the right */
+}
+
+/* Style for the send button container */
+.chat-input span {
+    align-self: center; /* Center the span vertically */
+    height: 40px;
+    line-height: 40px;
+    color: #15274B;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    visibility: hidden; /* Hide by default */
+    font-size: 1.35rem;
+}
+
+/* Show the send button when textarea has content */
+.chat-input textarea:valid ~ span {
+    visibility: visible;
+}
+
+/* Style for the send button */
+#send-btn {
+    cursor: pointer;
+    color: #15274B;
+    font-size: 1.5rem;
+}
+
+@media(max-width: 490px) {
+    .chatbot {
+        right: 0;
+        bottom: 0;
+        width: 50%;
+        height: 50%;
+        border-radius: 0;
+    }
+    .chatbot .chatbox {
+        height: 90%;
+    
+    }
+    
+}
+
+    </style>
+    <title>Basic | IDT Chatbot</title>
+</head>
+<body>
+    <button class="chatbot-speedbuble">
+        <img src="/media/images/chat_logo.png" alt="Large img" class="large-img">  
+    </button>
+    <div class="chatbot">
+        <header>
+            <h2>
+                <img src="/media/images/chatbot_logo.png" alt="Medium Image" class="medium-img">
+                <img src="/media/images/cross-23.png" alt="Small Image" class="small-img">
+                <!-- <div class="small-img"></div> -->
+                <img src="/media/images/clear-black.png" alt="Small Image" class="small-img-top">
+
+                <!-- <div class="small-img-top"></div> -->
+                <!-- <img src="images/full-screen-exit-icon-2048x2048-s2nwq2dd.png" alt="full screen Image" class="full-screen"> -->
+                <!-- <div class="full-screen"></div> -->
+            </h2>
+            
+        </header>
+        <ul class="chatbox">
+            <li class="chat incoming">
+                <img src="/media/images/response_logo.png" alt="Avatar" class="avatar">
+                <p>Hello, I’m a chatbot of CADT.</p>
+            </li>
+            <li class="chat outgoing">
+                <!-- <img src="images/question_logo_.png" alt="nested-img" class="nested-img">
+                <p>What's CADT?</p> -->
+            </li>
+        </ul>
+        <div class="container-chatbot">
+            <div class="confirmation-box" id="confirmationBox">
+                <div class="text">Are you sure to clear the chat?</div>
+                <div class="Button-container">
+                    <div class="Button yes-Button" id="yesButton">Yes</div>
+                    <div class="Button cancel-Button" id="cancelButton">Cancel</div>
+                </div>
+            </div>
+        </div>
+        <div class="chatbot-content"></div>
+        <!-- <div class="buttons">
+            <div class="button">
+                <div class="button-text">Question 1</div>
+            </div>
+            <div class="button">
+                <div class="button-text">Question 2</div>
+            </div>
+            <div class="button">
+                <div class="button-text">Question 3</div>
+            </div>
+            <div class="button">
+                <div class="button-text">Question 4</div>
+            </div>
+            <div class="button">
+                <div class="button-text">Question 5</div>
+            </div>
+            <div class="button">
+                <div class="button-text">Question 6</div>
+            </div>
+        </div> -->
+        <div class="chat-input">
+            <textarea id="inputquestion" placeholder="Enter your message..." required></textarea>
+            <span id="send-btn" class="material-symbols-outlined">send</span>
+        </div>
+    </div>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatbotSpeedBubble = document.querySelector('.chatbot-speedbuble');
+            const chatbot = document.querySelector('.chatbot');
+            const closeBtn = document.querySelector('.small-img');
+            const chatbox = document.querySelector('.chatbox');
+            const chatInput = document.getElementById("inputquestion");
+            const sendChatBtn = document.querySelector("#send-btn");
+            const img = document.querySelector('.small-img-top '); // Modified this line to target the image inside .small-img-top
+            const containerChatbot = document.querySelector('.container-chatbot');
+            const cancelButton = document.querySelector('.cancel-Button');
+            const yesButton = document.querySelector('.yes-Button');
+        
+            let userMessage;
+            const API_KEY = "^2yv7bhrvkrac$3k+qqaex*wcb2s#jwjkw7+&9f1&c@yxlk$ag";
+            const inputInHeight = chatInput.scrollHeight;
+        
+            // Function to set a cookie
+            const setCookie = (name, value, days) => {
+                let expires = "";
+                if (days) {
+                    const date = new Date();
+                    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                    expires = "; expires=" + date.toUTCString();
+                }
+                document.cookie = name + "=" + (value || "") + expires + "; path=/";
+            };
+        
+            // Function to get a cookie by name
+            const getCookie = (name) => {
+                const nameEQ = name + "=";
+                const ca = document.cookie.split(';');
+                for (let i = 0; i < ca.length; i++) {
+                    let c = ca[i];
+                    while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                    if (c.indexOf(nameEQ) == 0) {
+                        const cookieValue = c.substring(nameEQ.length, c.length);
+                        return cookieValue;
+                    }
+                }
+                return null;
+            };
+        
+            // Function to load chat history from the cookie
+            const loadChatHistory = () => {
+                const chatHistory = getCookie("chatHistory");
+                if (chatHistory) {
+                    const messages = JSON.parse(chatHistory);
+                    messages.forEach(message => {
+                        const chatLi = createChatLi(message.text, message.className,save=false);
+                        chatbox.appendChild(chatLi);
+                    });
+                    chatbox.scrollTo(0, chatbox.scrollHeight);
+                }
+            };
+        
+            // Function to store chat message in the cookie
+            const storeChatMessage = (message, className) => {
+                let chatHistory = getCookie("chatHistory");
+                try {
+                    chatHistory = chatHistory ? JSON.parse(chatHistory) : [];
+                } catch (error) {
+                    chatHistory = [];
+                }
+                chatHistory.push({ text: message, className: className });
+                setCookie("chatHistory", JSON.stringify(chatHistory), 60);
+            };
+        
+            const createChatLi = (message, className,save=true) => {
+                const chatLi = document.createElement("li");
+                chatLi.classList.add("chat", className);
+        
+                let avatarSrc = className === "outgoing" ? "/media/images/question_logo_.png" : "/media/images/response_logo.png";
+                let imgClass = className === "outgoing" ? "nested-img" : "avatar";
+                let chatContent = `<img src="${avatarSrc}" alt="Avatar" class="${imgClass}"> <p>${message}</p>`;
+                chatLi.innerHTML = chatContent;
+        
+                // Store the chat message in the cookie
+                if(save){
+                    storeChatMessage(message, className);
+                }
+                return chatLi;
+            };
+            
+            async function fetchData(API_URL, requestOptions, messageElement) {
+                try {
+                    const response = await fetch(API_URL, requestOptions);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    console.log("Response data:", data.answer);
+                    if (data.answer) {
+                        const responseMessage = data.answer.trim();
+                        messageElement.textContent = responseMessage;
+                        createChatLi(responseMessage, "incoming");
+                    } else {
+                        throw new Error("Empty response from API");
+                    }
+                } catch (error) {
+                    const errorMessage = error.message.replace(/\s+/g, '-');
+                    messageElement.classList.add("error", errorMessage);
+                    console.error("Error:", error);
+                } finally {
+                    chatbox.scrollTo(0, chatbox.scrollHeight);
+                }
+                return true;
+            }
+        
+            const generateResponse = async(chatElement) => {
+                const API_URL = "/api/response/";
+                const messageElement = chatElement.querySelector("p");
+                console.log(`Message element jfsffffff${chatInput.value}ffffffffffffffffffffffffffffff`);
+                const requestOptions = {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `${API_KEY}`,
+                        "Accept": "application/json"
+                    },
+                    body: JSON.stringify({
+                        "question": chatInput.value
+                    })
+                };
+                await fetchData(API_URL, requestOptions, messageElement);
+                chatInput.value = "";
+            };
+            
+            const handleChat = async() => {
+                userMessage = chatInput.value.trim();
+                if (!userMessage) return;
+                chatInput.style.height = `40px`;
+                const outgoingChatLi = createChatLi(userMessage, "outgoing");
+                chatbox.appendChild(outgoingChatLi);
+                chatbox.scrollTo(0, chatbox.scrollHeight);
+                const incomingChatLi = createChatLi("Thinking...", "incoming",save=false);
+                chatbox.appendChild(incomingChatLi);
+                chatbox.scrollTo(0, chatbox.scrollHeight);
+                setTimeout(async () => {
+                    await generateResponse(incomingChatLi);
+                }, 100);
+            };
+        
+            chatInput.addEventListener("input", () => {
+                chatInput.style.height = `${inputInHeight}px`;
+                chatInput.style.height = `${chatInput.scrollHeight}px`;
+            });
+        
+            chatInput.addEventListener("keydown", async(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    await handleChat();
+                }
+            });
+        
+            sendChatBtn.addEventListener("click", handleChat);
+        
+            // Function to toggle chatbot visibility
+            const toggleChatbot = () => {
+                chatbot.classList.toggle('show');
+            };
+        
+            // Event listener for clicking the chat bubble
+            chatbotSpeedBubble.addEventListener('click', toggleChatbot);
+        
+            // Event listener for clicking the close button
+            closeBtn.addEventListener('click', () => {
+                chatbot.classList.remove('show');
+            });
+        
+            // Event listener for clicking outside the chatbot
+            document.addEventListener('click', (e) => {
+                if (!chatbot.contains(e.target) && !chatbotSpeedBubble.contains(e.target)) {
+                    // Click occurred outside the chatbot and its speed bubble
+                    chatbot.classList.remove('show');
+                }
+            });
+        
+            // Function to toggle visibility of recommendation buttons
+            const toggleRecommendationButtons = () => {
+                const buttonsContainer = document.querySelector('.buttons');
+        
+                if (chatbox.scrollTop === chatbox.scrollHeight - chatbox.clientHeight) {
+                    buttonsContainer.style.display = 'none';
+                } else {
+                    buttonsContainer.style.display = 'flex';
+                }
+            };
+        
+            // Event listener for scrolling in chatbox
+            chatbox.addEventListener('scroll', toggleRecommendationButtons);
+        
+            // Show confirmation box when the image is clicked
+            img.addEventListener('click', () => {
+                containerChatbot.style.display = 'flex';
+            });
+            
+            // Hide confirmation box when cancel button is clicked
+            cancelButton.addEventListener('click', () => {
+                containerChatbot.style.display = 'none';
+            });
+        
+            // Clear chatbox and start new chat when yes button is clicked
+            yesButton.addEventListener('click', () => {
+                const cookies = document.cookie.split(";");
+        
+                // Loop through all cookies and delete each one
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i];
+                    const eqPos = cookie.indexOf("=");
+                    const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+                    // Set the cookie's expiration date to the past
+                    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+                }
+                // Clear all messages in chatbox
+                chatbox.innerHTML = '';
+        
+                // Create a new incoming chat message
+                const newIncomingMessage = createChatLi("Hello, I’m a chatbot of CADT.", "incoming",save=false);
+                chatbox.appendChild(newIncomingMessage);
+        
+                // Optionally add an image or any other element to the chatbox
+                const incomingImage = document.createElement("img");
+        
+                chatbox.appendChild(incomingImage);
+        
+                // Scroll to the bottom of the chatbox
+                chatbox.scrollTo(0, chatbox.scrollHeight);
+                // Hide the confirmation box
+                containerChatbot.style.display = 'none';
+            });
+        
+            // Load chat history when the page is loaded
+            loadChatHistory();
+        });
+        
+        </script>
+</body>
+</html>

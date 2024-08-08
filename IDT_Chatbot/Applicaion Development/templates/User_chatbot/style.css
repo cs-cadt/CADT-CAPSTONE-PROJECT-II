@@ -1,0 +1,490 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Inter;
+}
+
+body {
+    background: #FFF; /* White background */
+}
+
+.chatbot-speedbuble {
+    right: 40px;
+    bottom: 15px;
+    position: fixed;
+    width: 70px;
+    height: 70px;
+    cursor: pointer;
+    background: none; /* Remove background */
+    border: none; /* Remove border */
+    display: flex;
+    align-items: center; 
+    justify-content: center; 
+    z-index: 1000; /* Ensure the bubble is above other elements */
+}
+
+.chatbot-speedbuble .large-img {
+    width: 70px;
+    height: 70px;
+    cursor: pointer;
+    z-index: 1001; /* Ensure the image is above other elements in the bubble */
+} 
+
+.chatbot {
+    position: fixed;
+    right: 100px;
+    bottom: 100px;
+    top:20px;
+    width: 400px;
+    overflow: hidden;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 0 128px 0 rgba(0, 0, 0, 0.1),
+                0 32px 64px -48px rgba(0, 0, 0, 0.5);
+    z-index: 999; /* Ensure the chatbot is above most elements but below the bubble */
+    display: none; /* Initially hide the chatbot */
+}
+
+.chatbot.show {
+    display: block; /* Show the chatbot when the .show class is added */
+}
+
+.chatbot header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    height: 50px;
+    background: #15274B;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25) inset;
+    position: relative;
+}
+
+.chatbot header h2 {
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Tooltip Container */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+/* Tooltip Text */
+.tooltip-text {
+    visibility: hidden;
+    position: absolute;
+    bottom: -35px; /* Position the tooltip 35px below the header */
+    left: 50%; /* Center the tooltip horizontally */
+    transform: translateX(-50%); /* Center the tooltip horizontally */
+    background-color: #343232; /* Background color for the tooltip */
+    color: #fefefe; /* Text color */
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    white-space: nowrap; /* Prevent text from wrapping */
+    display: none; /* Initially hide the tooltip */
+    z-index: 1000; /* Ensure the tooltip appears above other elements */
+}
+
+/* Show the tooltip text when hovering over the tooltip container */
+.tooltip:hover .tooltip-text {
+    visibility: visible;
+}
+
+body.blur {
+    filter: blur(10px);
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.confirmation-box.show {
+    display: block;
+}
+
+.container-chatbot {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* or a fixed height value */
+    width: 100%; /* or a fixed width value */
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none; /* Hide container by default */
+    z-index: 9999; /* Ensure it is above other elements */
+    background: rgba(0, 0, 0, 0.5); /* Add a semi-transparent background */
+}
+
+.confirmation-box {
+    width: 270px;
+    height: 100px;
+    flex-shrink: 0;
+    border-radius: 16px;
+    border: 1px solid #000;
+    background: #1B2F6F;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    display: flex;
+    top:20px;
+    flex-direction: column;
+    justify-content: center; /* Center the content vertically */
+    align-items: center; /* Center the content horizontally */
+}
+
+.text {
+    flex-shrink: 0;
+    color: #FFF;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.Button-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 50%;
+}
+
+.Button {
+    width: 64px;
+    height: 24px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 15px; /* Add margin to create space between buttons */
+    cursor: pointer;
+}
+
+.cancel-Button {
+    background: #F58C29;
+    color: #FFF;
+}
+
+.yes-Button {
+    background: #F00;
+    color: #FFF;
+}
+
+.yes-Button:hover {
+    background-color: #E60000;
+}
+
+.cancel-Button:hover {
+    background-color: #DD7E25;
+}
+
+.medium-img {
+    width: 40px;
+    height: 40px;
+    position: relative;
+    margin-right: 340px;
+}
+
+.small-img {
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    right: 20px;
+    filter: invert(100%);
+    cursor: pointer;
+}
+.small-img:hover::after {
+    content: "Close";
+    display: inline-block;
+    width: auto;
+    position: absolute;
+    font-size: 12px;
+    left: -10px; /* Adjust position as needed */
+    bottom: -33px; /* Adjust position as needed */
+    background-color: #343232; /* Background color for the text */
+    color: #fefefe; /* Text color */
+    padding: 5px;
+    border-radius: 5px;
+    white-space: nowrap; /* Prevents text from wrapping */
+    text-align: center;
+}
+
+.small-img-top {
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    right: 50px;
+    cursor: pointer;
+    filter: invert(100%);
+    
+}
+
+.small-img-top:hover::after {
+    content: "Clear all meassages";
+    display: inline-block;
+    width: auto;
+    position: absolute;
+    font-size: 12px;
+    left: -60px; /* Adjust position as needed */
+    bottom: -30px; /* Adjust position as needed */
+    background-color: #7e7a7a; /* Background color for the text */
+    color: #fff; /* Text color */
+    padding: 5px;
+    border-radius: 5px;
+    white-space: nowrap; /* Prevents text from wrapping */
+    text-align: center;
+  
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+    margin-right: 10px;
+}
+
+.nested-img {
+    width: 36px;
+    height: 36px;
+    margin-left: 10px; /* Adjust margin to left to provide space between text and image */
+}
+
+.full-screen {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    right: 90px;
+    cursor: pointer;
+    filter: invert(100%); /* This will invert the colors, making black white */
+}
+
+.full-screen:hover::after {
+    content: " Full Screen";
+    display: inline-block;
+    position: absolute;
+    font-size: 12px;
+    left: -30px; /* Adjust position as needed */
+    bottom: -35px; /* Adjust position as needed */
+    background-color: #343232; /* Background color for the text */
+    color: #fefefe; /* Text color */
+    padding: 5px;
+    border-radius: 5px;
+    white-space: nowrap; /* Prevents text from wrapping */
+}
+
+.chatbot .chatbox {
+    height: calc(100% - 150px); /* Adjusted height to account for header and chat input */
+    overflow: auto;
+    padding: 30px 20px 100px;
+}
+
+.chatbot :where(.chatbox, textarea)::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chatbot :where(.chatbox, textarea)::-webkit-scrollbar-track {
+    background: #fff;
+    border-radius: 25px;
+}
+
+.chatbot :where(.chatbox, textarea)::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 25px;
+}
+
+.chatbox .chat {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.chatbox .chat p.error {
+    color: #721c24;
+    background: #f8d7da;
+}
+
+.chatbox .outgoing {
+    justify-content: flex-start;
+    flex-direction: row-reverse; /* Ensures image is to the right of the text */
+}
+
+.chatbox .chat p {
+    color: #FFF;
+    max-width: 75%;
+    word-wrap: break-word;
+    font-size: 0.95rem;
+    padding: 12px 16px;
+    border-radius: 10px 10px 0px 10px;
+    background: #1B2F6F;
+}
+
+.chatbox .incoming p {
+    color: #000;
+    background: #f2f2f2;
+    border-radius: 10px 10px 10px 0px;
+}
+
+/* Style for the scrolling content container */
+.chatbot-::content  {
+    width: 100%;
+    height: 48px;
+    overflow-x: auto;
+    white-space: nowrap;
+    position: absolute;
+    top: calc(100% - 40px); /* Adjusted position from bottom */
+    scrollbar-width: auto; /* For Firefox */
+    -ms-overflow-style: auto; /* For Internet Explorer and Edge */
+    z-index: -1000;
+}
+
+/* Style for the buttons container */
+.buttons {
+    width: 100%;
+    height: 44px;
+    display: flex;
+    white-space: nowrap;
+    align-items: center;
+    position: absolute;
+    top: calc(100% - 130px); /* Position above the chat input */
+    overflow-x: auto;
+    scrollbar-width: none; /* For Firefox */
+    -ms-overflow-style: none; /* For Internet Explorer and Edge */
+    scroll-snap-type: x mandatory; /* For scrolling both ways */
+    margin-left: 20px; /* Adjusted margin on the left side */
+    background: #fff; /* Optional: background color to ensure visibility */
+    height: 40px;
+    margin: 40 20px; /* Adjust margin as needed */
+    
+}
+
+.buttons::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+/* Style for individual buttons */
+.button {
+    width: 134px; /* Adjusted width to fit within .buttons container */
+    height: 40px; /* Adjusted height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0; /* Prevent shrinking */
+    margin: 0px 5px; /* Adjusted margin between buttons */
+    cursor: pointer;
+    
+}
+
+/* Style for the content inside each button */
+.button div {
+    width: 100%;
+    height: 100%;
+    background: rgb(255, 255, 255);
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
+    border-radius: 20px;
+    border: 2px solid #1B2F6F;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.button div:hover {
+    background: #1B2F6F;
+    color: #fff;
+    border-radius: 20px;
+    border: 2px solid #141212;
+}
+
+/* Setting scroll-snap points for each button */
+.button:nth-child(1) {
+    scroll-snap-align: start;
+}
+
+.button:nth-child(6) {
+    scroll-snap-align: end;
+}
+
+/* Style for the chat input container */
+.chatbot .chat-input {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    position: absolute;
+    width: 95%;
+    background: #fff;
+    padding: 3px 20px;
+    border-radius: 28px;
+    border: 2px #1B2F6F solid;
+    bottom: 20px;
+    margin-left: 10px;
+}
+
+/* Style for the textarea inside the chat input */
+.chat-input textarea {
+    width: calc(100% - 30px); /* Adjust width to accommodate send button */
+    height: 44px; /* Fixed height for textarea */
+    padding: 13px; /* Adjust padding to fit within the container */
+    border-radius: 10px;
+    border: none;
+    resize: none;
+    outline: none;
+    color: #3e3c3c;
+    font-size: 0.95rem;
+    font-weight: 400;
+    display: flex;
+    text-align: left; /* Ensure text is left-aligned */
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
+    background: transparent; /* Remove background to match the container */
+    margin-right: 10px; /* Add a small margin to the right */
+}
+
+/* Style for the send button container */
+.chat-input span {
+    align-self: center; /* Center the span vertically */
+    height: 40px;
+    line-height: 40px;
+    color: #15274B;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    visibility: hidden; /* Hide by default */
+    font-size: 1.35rem;
+}
+
+/* Show the send button when textarea has content */
+.chat-input textarea:valid ~ span {
+    visibility: visible;
+}
+
+/* Style for the send button */
+#send-btn {
+    cursor: pointer;
+    color: #15274B;
+    font-size: 1.5rem;
+}
+
+@media(max-width: 490px) {
+    .chatbot {
+        right: 0;
+        bottom: 0;
+        width: 50%;
+        height: 50%;
+        border-radius: 0;
+    }
+    .chatbot .chatbox {
+        height: 90%;
+    
+    }
+    
+}
+
+

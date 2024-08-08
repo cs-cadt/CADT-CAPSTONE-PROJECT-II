@@ -1,0 +1,97 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block title %} Admin | Edit Model File {% endblock title %}
+
+{% block extrastyle %}
+<!-- Add any additional CSS here -->
+{% endblock extrastyle %}
+
+{% block bodyclass %} hold-transition sidebar-mini {% endblock bodyclass %}
+
+{% block content %}
+<div class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Edit Model File</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'manage_models' %}">Model List</a></li>
+            <li class="breadcrumb-item active">Edit Model</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title pt-3">Edit Model File</h3>
+            </div>
+            <div class="card-body">
+              <form id="edit-model-form" method="POST" action="{% url 'edit_model' file_name %}">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label for="name">New Model File Name:</label>
+                  <input type="text" class="form-control" id="name" name="name" value="{{ file_name|cut:'.pkl' }}" required>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <a href="{% url 'manage_models' %}" class="btn btn-secondary">Back</a>
+                  </div>
+                  <div class="col-md-6 text-right">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock content %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+  $(document).ready(function () {
+    $('#edit-model-form').on('submit', function (e) {
+      e.preventDefault();
+      var formData = $(this).serialize();
+
+      $.ajax({
+        url: $(this).attr('action'),
+        type: 'POST',
+        data: formData,
+        success: function (response) {
+          Swal.fire(
+            'Success!',
+            'Model file name has been updated.',
+            'success'
+          ).then(() => {
+            window.location.href = '{% url "manage_models" %}';
+          });
+        },
+        error: function (xhr, textStatus, errorThrown) {
+          Swal.fire(
+            'Error!',
+            xhr.responseJSON.error,
+            'error'
+          );
+          console.error("Error:", textStatus, errorThrown);
+          console.error("Response:", xhr.responseText);
+        }
+      });
+    });
+  });
+</script>
+{% endblock extra_scripts %}

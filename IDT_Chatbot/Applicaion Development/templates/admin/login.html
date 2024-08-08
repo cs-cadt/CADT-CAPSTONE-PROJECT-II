@@ -1,0 +1,116 @@
+{% extends 'layouts/auth_base.html' %}
+
+{% block title %} Log in {% endblock title %}
+
+{% block bodyclass %} login-page {% endblock bodyclass %}
+
+{% block content %}
+<div class="login-box">
+    <div class="login-logo">
+        <div class="user-panel d-flex-center">
+            <div class="image">
+              <img
+                src="/media/images/main_logo2.png"
+                alt="Image"
+                style="width: 200px; height: auto;"
+              />
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body login-card-body">
+            <p class="login-box-msg">Sign in to admin session</p>
+            <form id="login-form" method="post" action="">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.GET.next }}">
+                <div id="message" class="text-danger mb-3"></div>
+                
+                {% if form.non_field_errors %}
+                    {% for error in form.non_field_errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                    {% endfor %}
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="input-group mb-3">
+                        {{ field }}
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas {% if field.name == 'username' %} fa-user {% else %} fa-lock {% endif %}"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <small class="text-danger">{{ field.errors }}</small>
+                {% endfor %}
+
+                <div class="row">
+                    <div class="col-8">
+                        <div class="icheck-primary">
+                            <p>
+                                <a href="{%url 'forgot_password'%}">Forgot Password</a>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById("login-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            let username = document.getElementById("id_username").value;
+            let password = document.getElementById("id_password").value;
+
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            // API request to authenticate user
+            fetch('/api/auth/login/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Response Status:', response.status);
+                    return response.text().then(text => {
+                    throw new Error(`Login failed: ${text}`);
+                });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('API Response:', data);
+                if (data.token) {
+                    console.log('Token:', data.token);  // Debugging: log the token
+                localStorage.setItem('adminToken', data.token);  // Store token in localStorage
+                console.log('Token stored in localStorage:', localStorage.getItem('adminToken'));  // Confirm token storage
+                
+                // alert('Login successful! Redirecting to dashboard...');
+                // Redirect to admin dashboard or another page
+                window.location.href = '{% url "dashboard" %}';
+                } else {
+                    document.getElementById("message").innerText = data.message || 'Login failed. Please check your credentials.';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById("message").innerText = 'Login failed. Please check your credentials and try again.';
+            });
+        });
+    });
+</script>
+
+{% endblock %}

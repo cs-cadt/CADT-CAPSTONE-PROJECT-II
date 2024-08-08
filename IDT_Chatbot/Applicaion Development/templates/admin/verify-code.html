@@ -1,0 +1,85 @@
+{% extends 'layouts/auth_base.html' %}
+
+{% block title %} Verify Code {% endblock title %}
+
+{% block bodyclass %} login-page {% endblock bodyclass %}
+
+{% block content %}
+<div class="login-box">
+  <div class="login-logo">
+    <div class="user-panel d-flex-center">
+        <div class="image">
+          <img
+            src="/media/images/main_logo2.png"
+            alt="Image"
+            style="width: 200px; height: auto;"
+          />
+        </div>
+    </div>
+  </div>
+  <!-- /.login-logo -->
+  <div class="card">
+    <div class="card-body login-card-body">
+      <p class="login-box-msg">Enter the code sent to your email</p>
+
+      <form id="verifyCodeForm">
+        <div class="input-group mb-3">
+          <input type="email" id="email" name="email" class="form-control" placeholder="Email" required>
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-envelope"></span>
+            </div>
+          </div>
+        </div>
+        <div class="input-group mb-3">
+          <input type="text" id="code" name="code" class="form-control" placeholder="Verification Code" required>
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-key"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary btn-block">Verify Code</button>
+          </div>
+        </div>
+      </form>
+
+      <p id="message" class="mt-3"></p>
+    </div>
+    <!-- /.login-card-body -->
+  </div>
+</div>
+
+<script>
+document.getElementById('verifyCodeForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const email = document.getElementById('email').value;
+    const code = document.getElementById('code').value;
+
+    fetch('/api/auth/forgot/verify/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ email: email, code: code }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('message').textContent = data.message;
+        if (data.message === 'Code is correct') {
+            localStorage.setItem('verifyToken', data.verify);
+            window.location.href = '{% url "reset_password" %}'; // Navigate to the reset-password page
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+});
+</script>
+
+{% endblock %}

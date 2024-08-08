@@ -1,0 +1,7 @@
+# python 3.11.7
+Django==5.0.6
+djangorestframework==3.15.1
+markdown==3.4.1
+django-filter==24.2
+python-decouple==3.8
+django-admin-adminlte==1.0.5

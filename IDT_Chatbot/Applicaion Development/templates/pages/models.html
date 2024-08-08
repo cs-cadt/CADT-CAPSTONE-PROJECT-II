@@ -1,0 +1,323 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block title %} Admin | Manage Model {% endblock title %}
+
+{% block extrastyle %}
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="{% static 'plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+<style>
+  /* Custom style for table pagination and length select */
+  .dataTables_length select{
+    background-color: #f58c29 !important;
+    color: white !important;
+    border-color: white !important;
+  }
+
+  /* Custom style for search button icon */
+  .dataTables_filter label::after {
+    content: "\f002"; /* Unicode for magnifying glass icon */
+    font-family: "Font Awesome 5 Free"; /* Font Awesome icon font */
+    font-weight: 900;
+    color: #15274b; /* Adjust color to #03b4ab */
+    padding-left: 5px;
+  }
+
+  /* Custom style for action buttons */
+  .table-actions a {
+    color: #15274b; /* Adjust icon color to #03b4ab */
+  }
+
+  /* Custom style for action button icons */
+  .table-actions a i {
+    font-size: 16px;
+    margin-right: 5px;
+  }
+
+  /* Custom style for buttons */
+  .btn-color {
+    background-color: #f58c29 !important;
+    border-color: white !important;
+    color: white !important;
+
+  }
+  #action-toggle{
+    transform: scale(1.5);
+  }
+  .action-dropdown {
+  /* Basic styling */
+  padding: 5px 10px;
+  border: 2px solid #15274b;
+  border-radius: 4px;
+  font-size: 16px; /* Adjust font size as needed */
+  cursor: pointer; /* Indicate clickable area */
+  
+  /* Optional styling */
+  background-color: #fff; /* Background color */
+  color: #333; /* Text color */
+}
+
+.action-dropdown:hover { /* Hover effect */
+  background-color: #eee; /* Change background color on hover */
+}
+.btn-orange {
+  background-color: #f58c29;
+  color: white;
+  border-color: orange;
+}
+
+.btn-blue {
+  background-color: #15274b;
+  color: white;
+  border-color: #15274b;
+}
+
+.btn-orange:hover {
+  background-color: darkorange;
+  border-color: darkorange;
+}
+</style>
+{% endblock extrastyle %}
+
+{% block bodyclass %} hold-transition sidebar-mini {% endblock bodyclass %}
+
+{% block content %}
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Model List</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="{%url 'dashboard'%}">Home</a></li>
+            <li class="breadcrumb-item active">Model List</li>
+          </ol>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          
+        </div>
+      </div>
+    </div>
+    <!-- /.container-fluid -->
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title pt-3">Model Management</h3>
+              <div class="card-tools pr-4">
+
+                <!-- if statement here - to allow to add model -->
+                <a
+                  href="{% url 'model_upload' %}"
+                  class="btn btn-sm btn-outline-gray-600 btn-orange"
+                >
+                  <i class="fa fa-plus-circle mr-1"></i>Add Model
+                </a>
+                <a
+                  href="{% url 'change_model' %}"
+                  class="btn btn-sm btn-outline-gray-600 btn-blue"
+                >
+                  <i class="fa fa-plus-circle mr-1"></i>Change Model
+                </a>
+                <a
+                  href="{% url 'train_model' %}"
+                  class="btn btn-sm btn-outline-gray-600 btn-orange"
+                >
+                  <i class="fa fa-plus-circle mr-1"></i>Train Model
+                </a>
+                <!-- end if statement -->
+
+              </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+              <form method="POST" action="#">
+                {% csrf_token %}
+                <!-- <div class="row pb-5">
+                  <div class="col-md-12">
+                    <button type="submit" class="delete-btn btn btn-outline-info btn-sm" id="deleteBtn">
+                      Delete All Selected
+                    </button>
+                  </div>
+                </div> -->
+              <table id="example1" class="table table-bordered table-striped">
+                <thead>
+                  <tr>
+                    <!-- <th class="action-checkbox-column">
+                      <div class="form-check">
+                        <div class="form-check-label">
+                          <input type="checkbox" id="action-toggle" onclick="toggle(this)">
+                        </div>
+                      </div>
+                    </th> -->
+                    <th>Model File Name</th>
+                    <!-- <th>Status</th> -->
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for model in models %}
+                  <tr>
+                    <td>{{ model.name }}</td>
+                    <!-- <td>{{ model.status }}</td> -->
+                    <td class="table-actions">
+                      <a href="{% url 'edit_model' model.name %}" class="edit pl-2" title="Edit" data-toggle="tooltip">
+                          <i class="fas fa-edit" style="color: #03b4ab"></i>
+                      </a>
+                      <a href="#" class="delete pl-2" title="Delete" data-toggle="tooltip" data-file-name="{{ model.name }}">
+                        <i class="fas fa-trash-alt" style="color: red"></i>
+                      </a>
+                  </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </form>
+            </div>
+            <!-- /.card-body -->
+          </div>
+          <!-- /.card -->
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+  </section>
+  <!-- /.content -->
+</div>
+{% endblock content %}
+
+{% block extra_scripts %}
+<!-- DataTables & Plugins -->
+<script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/jszip/jszip.min.js' %}"></script>
+<script src="{% static 'plugins/pdfmake/pdfmake.min.js' %}"></script>
+<script src="{% static 'plugins/pdfmake/vfs_fonts.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+
+<!-- Page specific script -->
+
+
+<script>
+  // Initialize DataTable with pagination and custom dropdown menu for page length
+  $(document).ready(function () {
+    $("#example1").DataTable({
+      paging: false,  // Enable pagination : Allows users to naviagate through pages 
+      lengthChange: true, // Enable the display fo a leangth changing input  : allow user to select the number of records displayed per page
+      searching: true, // Enable searching : allow user to search for specific data writin in table 
+      ordering: false, // Enable ordering : allows users 
+      info: true, // Enable table information summary : Display information about the current page , total nubers of record 
+      autoWidth: false,
+      responsive: true,  // Enable Responsive
+      // pageLength: 10, // Set the initial number of items per page: Determines how many records are displayed per page by default.
+      lengthMenu: [[10, 50, 100 ,-1], [10, 50, 100, "All"]], // Customize the dropdown menu options for page length: Provides a dropdown menu for users to select the number of records displayed per page. The first array specifies the available options, and the second array specifies the corresponding display labels.
+
+      
+          // Define DataTables buttons with custom styles
+      buttons: [
+       // Copy Button:
+       // - Extend: Allows users to copy data from the table.
+       // - ClassName: Applies a custom CSS class ('btn-color') to the button for styling purposes.
+       //{ extend: 'copy', className: 'btn-color' },
+
+       // CSV Button:
+       // - Extend: Allows users to export table data to a CSV file.
+       // - ClassName: Applies a custom CSS class ('btn-color') to the button for styling purposes.
+       { extend: 'csv', className: 'btn-color' },
+
+       // Excel Button:
+       // - Extend: Allows users to export table data to an Excel file.
+      // - ClassName: Applies a custom CSS class ('btn-color') to the button for styling purposes.
+      { extend: 'excel', className: 'btn-color' },
+
+       // PDF Button:
+      // - Extend: Allows users to export table data to a PDF file.
+      // - ClassName: Applies a custom CSS class ('btn-color') to the button for styling purposes.
+      { extend: 'pdf',  className: 'btn-color'},
+
+      // Print Button:
+     // - Extend: Allows users to print the table data.
+     // - ClassName: Applies a custom CSS class ('btn-color') to the button for styling purposes.
+    //  { extend: 'print', className: 'btn-color' },
+
+     // Column Visibility Button:
+     // - Extend: Allows users to toggle the visibility of table columns.
+     // - ClassName: Applies a custom CSS class ('btn-color') to the button for styling purposes.
+    // { extend: 'colvis', className: 'btn-color' }
+]
+
+    }).buttons().container().appendTo("#example1_wrapper .col-md-6:eq(0)"); // // Append buttons container to DataTable wrapper: This line appends the container for DataTables buttons to the DataTable wrapper, allowing the buttons to be positioned correctly within the layout.
+  });
+</script>
+
+<script>
+  $(document).ready(function () {
+    $('.delete').on('click', function (e) {
+      e.preventDefault();
+      
+      var fileName = $(this).data('file-name');
+      var url = "{% url 'delete_model' %}";
+
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "This action cannot be undone.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $.ajax({
+            url: `/models/delete/${fileName}/`, 
+            type: 'DELETE',
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}'
+            },
+            success: function (response) {
+              Swal.fire(
+                'Deleted!',
+                response.message,
+                'success'
+              ).then(() => {
+                window.location.reload();
+              });
+            },
+            error: function (xhr) {
+              var errorMessage = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : 'An error occurred.';
+              Swal.fire(
+                'Error!',
+                errorMessage,
+                'error'
+              );
+            }
+          });
+        }
+      });
+    });
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+   
+{% endblock extra_scripts %}

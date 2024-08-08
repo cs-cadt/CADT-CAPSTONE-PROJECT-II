@@ -1,0 +1,111 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block title %} Admin | Upload Model File {% endblock title %}
+
+{% block extrastyle %}
+<!-- Add any additional CSS here -->
+{% endblock extrastyle %}
+
+{% block bodyclass %} hold-transition sidebar-mini {% endblock bodyclass %}
+
+{% block content %}
+<div class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Upload Model File</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'manage_models' %}">Model List</a></li>
+            <li class="breadcrumb-item active">Upload Model</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title pt-3">Upload Model</h3>
+            </div>
+            <div class="card-body">
+              <form id="upload-model-form" method="POST" action="{% url 'model_upload' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label for="file">Choose Model File (.pkl):</label>
+                  <input type="file" class="form-control" id="file" name="file" accept=".pkl">
+                </div>
+                <div class="form-group">
+                  <label for="setting_file">Choose Setting File (.pkl):</label>
+                  <input type="file" class="form-control" id="setting_file" name="setting_file" accept=".pkl">
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <a href="{% url 'manage_models' %}" class="btn btn-secondary">Back</a>
+                  </div>
+                  <div class="col-md-6 text-right">
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock content %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+  $(document).ready(function () {
+    $('#upload-model-form').on('submit', function (e) {
+      e.preventDefault();
+      var formData = new FormData(this);
+
+      $.ajax({
+        url: '{% url "model_upload" %}',
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function (response) {
+          if (response.status === 200) {
+            Swal.fire(
+              'Success!',
+              response.message,
+              'success'
+            ).then(() => {
+              window.location.href = "{% url 'manage_models' %}";
+            });
+          } else {
+            Swal.fire(
+              'Error!',
+              response.message,
+              'error'
+            );
+          }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          Swal.fire(
+            'Error!',
+            'An error occurred while uploading the model. Please try again.',
+            'error'
+          );
+          console.error("Error:", textStatus, errorThrown);
+          console.error("Response:", jqXHR.responseText);
+        }
+      });
+    });
+  });
+</script>
+{% endblock extra_scripts %}
